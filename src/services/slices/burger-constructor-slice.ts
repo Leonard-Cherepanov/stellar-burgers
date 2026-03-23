@@ -1,10 +1,8 @@
-// src/services/slices/burger-constructor-slice.ts
-
 import { TIngredient } from '../../utils/types';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { nanoid } from 'nanoid';
 
-type TConstructorState = {
+export type TConstructorState = {
   bun: TIngredient | null;
   ingredients: (TIngredient & {
     type: 'sauce' | 'main';
@@ -12,7 +10,7 @@ type TConstructorState = {
   })[];
 };
 
-const initialState: TConstructorState = {
+export const initialState: TConstructorState = {
   bun: null,
   ingredients: []
 };
@@ -47,25 +45,23 @@ export const burgerConstructorSlice = createSlice({
     removeIngredient: (state, action: PayloadAction<number>) => {
       state.ingredients.splice(action.payload, 1);
     },
+    clearConstructor: (state) => {
+      state.bun = null;
+      state.ingredients = [];
+    },
     moveUpIngredient: (state, action: PayloadAction<number>) => {
       const index = action.payload;
       if (index > 0) {
-        const temp = state.ingredients[index];
-        state.ingredients[index] = state.ingredients[index - 1];
-        state.ingredients[index - 1] = temp;
+        const [item] = state.ingredients.splice(index, 1);
+        state.ingredients.splice(index - 1, 0, item);
       }
     },
     moveDownIngredient: (state, action: PayloadAction<number>) => {
       const index = action.payload;
       if (index < state.ingredients.length - 1) {
-        const temp = state.ingredients[index];
-        state.ingredients[index] = state.ingredients[index + 1];
-        state.ingredients[index + 1] = temp;
+        const [item] = state.ingredients.splice(index, 1);
+        state.ingredients.splice(index + 1, 0, item);
       }
-    },
-    clearConstructor: (state) => {
-      state.bun = null;
-      state.ingredients = [];
     }
   }
 });
@@ -73,7 +69,9 @@ export const burgerConstructorSlice = createSlice({
 export const {
   addIngredient,
   removeIngredient,
+  clearConstructor,
   moveUpIngredient,
-  moveDownIngredient,
-  clearConstructor
+  moveDownIngredient
 } = burgerConstructorSlice.actions;
+
+export default burgerConstructorSlice.reducer;
